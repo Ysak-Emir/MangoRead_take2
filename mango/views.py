@@ -23,13 +23,33 @@ class CardPagination(PageNumberPagination):
 
 # --- CARD ---
 
-class MangoCardCreateAPIView(APIView):
-    def post(self, request, format=None):
-        serializer = CardCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data={"Отзыв создан": serializer.data}, status=status.HTTP_201_CREATED)
-        return Response(data={"Что-то пошло не так!": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+# class MangoCardCreateAPIView(APIView):
+#     def post(self, request, format=None):
+#         serializer = CardCreateSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(data={"Отзыв создан": serializer.data}, status=status.HTTP_201_CREATED)
+#         return Response(data={"Что-то пошло не так!": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class MangoCardCreateAPIView(CreateAPIView):
+    queryset = MangoCard.objects.all()
+    serializer_class = CardCreateSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        card = MangoCard.objects.create(
+            title=serializer.validated_data['title'],
+            year=serializer.validated_data['year'],
+            description=serializer.validated_data['description'],
+            genre=serializer.validated_data['genre'],
+            type=serializer.validated_data['type'],
+        )
+        card.save()
+        return Response(data={serializer(card).data}, status=status.HTTP_201_CREATED)
+
+
 
 
 

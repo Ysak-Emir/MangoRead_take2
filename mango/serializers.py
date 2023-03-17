@@ -9,25 +9,26 @@ from users.models import User
 # class TypeSerializer()
 
 class CardCreateSerializer(serializers.Serializer):
-    type = serializers.SerializerMethodField()
-    genre = serializers.SerializerMethodField()
+    title = serializers.CharField(max_length=100, required=True)
+    year = serializers.IntegerField(max_value=3000, required=True)
+    description = serializers.CharField(max_length=2000)
+    genre = serializers.IntegerField()
+    type = serializers.IntegerField()
 
-    class Meta:
-        model = MangoCard
-        fields = 'title year description type genre'.split()
+    def create(self, validated_data):
+        return Review.objects.create(
+            title=validated_data["title"],
+            year=validated_data["year"],
+            description=validated_data["description"],
+            genre=validated_data["genre"],
+            type=validated_data["type"],
+        )
 
-    def get_type(self, instance):
-        return instance.type.type_title
-
-    def get_genre(self, instance):
-        return instance.genre.genre_title
 
 class CardListSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = MangoCard
         fields = "id profile_picture title year description".split()
-
 
 
 class CardDetailSerializer(serializers.ModelSerializer):
@@ -58,7 +59,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = 'id user text time_create'.split()
         read_only_fields = ['time_create']
-
 
 
 class ReviewCreateSerializer(serializers.Serializer):
