@@ -4,6 +4,7 @@ from users.models import User
 
 
 class Type(models.Model):
+    # id = models.AutoField()
     type_title = models.CharField(max_length=100, blank=False, verbose_name="Тип")
 
     class Meta:
@@ -11,10 +12,11 @@ class Type(models.Model):
         verbose_name_plural = "Типы"
 
     def __str__(self):
-        return Type.type_title
+        return self.type_title
 
 
 class Genre(models.Model):
+    # id = models.AutoField()
     genre_title = models.CharField(max_length=100, blank=False, verbose_name="Жанр")
 
 
@@ -23,14 +25,14 @@ class Genre(models.Model):
         verbose_name_plural = "Жанры"
 
     def __str__(self):
-        return Genre.genre_title
+        return self.genre_title
 
 
 class MangoCard(models.Model):
     profile_picture = models.ImageField(upload_to="mango_data/profile_picture", null=True, blank=False,
                                         verbose_name="Картинка")
     title = models.CharField(max_length=100, blank=False, verbose_name="Название манги")
-    year = models.IntegerField(max_length=3000, blank=False, verbose_name="Год")
+    year = models.IntegerField(blank=False, verbose_name="Год")
     description = models.TextField(null=True, blank=False, verbose_name="Описание")
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     genre = models.ManyToManyField(Genre, verbose_name="Жанр")
@@ -58,6 +60,6 @@ class Review(models.Model):
         ordering = ['time_create', 'user']
 
     def __str__(self):
-        return self.user
+        return str(self.user)
 
 

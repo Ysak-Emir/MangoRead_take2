@@ -6,7 +6,23 @@ from mango.models import MangoCard, Review
 from users.models import User
 
 
-class CardSerializer(serializers.ModelSerializer):
+# class TypeSerializer()
+
+class CardCreateSerializer(serializers.Serializer):
+    type = serializers.SerializerMethodField()
+    genre = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MangoCard
+        fields = 'title year description type genre'.split()
+
+    def get_type(self, instance):
+        return instance.type.type_title
+
+    def get_genre(self, instance):
+        return instance.genre.genre_title
+
+class CardListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MangoCard
@@ -16,17 +32,17 @@ class CardSerializer(serializers.ModelSerializer):
 
 class CardDetailSerializer(serializers.ModelSerializer):
     genre = serializers.SerializerMethodField()
-    genres_type = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = MangoCard
-        fields = "id profile_picture title year description time_create genre genres_type".split()
+        fields = "id profile_picture title year description time_create genre type".split()
 
     def get_genre(self, instance):
-        return instance.genre.genres_title
+        return instance.genre.genre_title
 
-    def get_genres_type(self, instance):
-        return instance.genres_type.type_title
+    def get_type(self, instance):
+        return instance.type.type_title
 
 
 class UserSerializer(serializers.ModelSerializer):
