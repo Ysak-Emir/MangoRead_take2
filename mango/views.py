@@ -33,6 +33,8 @@ class MangoCardAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
 
 
+
+
 class MangoCardListAPIView(generics.ListAPIView):
     queryset = MangoCard.objects.all()
     serializer_class = CardListSerializer
@@ -65,13 +67,9 @@ class ReviewListAPIView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
 
 
-class ReviewCreateAPIView(CreateAPIView):
-    serializer_class = ReviewCreateSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)
-
-        return Response({"post": serializer.data})
+class ReviewCreateAPIView(APIView):
+    def post(self, request):
+        review = ReviewCreateSerializer(data=request.data)
+        if review.is_valid():
+            review.save()
+        return Response({"message": "ok"}, status=201)

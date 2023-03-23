@@ -4,20 +4,18 @@ from users.models import User
 
 
 class Type(models.Model):
-    # id = models.AutoField()
-    type = models.CharField(max_length=100, blank=False, verbose_name="Тип")
+    type_title = models.CharField(max_length=100, blank=False, verbose_name="Тип")
 
     class Meta:
         verbose_name = "Тип"
         verbose_name_plural = "Типы"
 
     def __str__(self):
-        return self.type
+        return self.type_title
 
 
 class Genre(models.Model):
-    # id = models.AutoField()
-    genre = models.CharField(max_length=100, blank=False, verbose_name="Жанр")
+    genre_title = models.CharField(max_length=100, blank=False, verbose_name="Жанр")
 
 
     class Meta:
@@ -25,7 +23,7 @@ class Genre(models.Model):
         verbose_name_plural = "Жанры"
 
     def __str__(self):
-        return self.genre
+        return self.genre_title
 
 
 class MangoCard(models.Model):

@@ -23,7 +23,6 @@ class CardSerializer(serializers.ModelSerializer):
         fields = ["profile_picture", "title", "year", "description", "genre", "type"]
 
 
-
 class CardListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MangoCard
@@ -31,18 +30,16 @@ class CardListSerializer(serializers.ModelSerializer):
 
 
 class CardDetailSerializer(serializers.ModelSerializer):
-    genre = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    genre = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = MangoCard
         fields = "id profile_picture title year description time_create genre type".split()
 
-    def get_genre(self, instance):
-        return instance.genre.genre
-
-    def get_type(self, instance):
-        return instance.type.type
+    @staticmethod
+    def get_type(instance):
+        return instance.type.type_title
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -60,10 +57,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ['time_create']
 
 
-class ReviewCreateSerializer(serializers.Serializer):
-    user = serializers.IntegerField()
-    text = serializers.CharField(max_length=200, required=True)
-    mango = serializers.IntegerField()
+class ReviewCreateSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        return Review.objects.create(**validated_data)
+    class Meta:
+        model = Review
+        fields = '__all__'
