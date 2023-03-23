@@ -1,12 +1,14 @@
 from rest_framework import generics, filters, status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from mango.models import MangoCard, Review
-from mango.serializers import CardListSerializer, ReviewSerializer, CardDetailSerializer, ReviewCreateSerializer, CardCreateSerializer
+from mango.serializers import CardListSerializer, ReviewSerializer, CardDetailSerializer, ReviewCreateSerializer, \
+    CardSerializer
+
 
 # --- PAGINATION ---
 
@@ -21,36 +23,14 @@ class CardPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 12
 
+
 # --- CARD ---
 
-# class MangoCardCreateAPIView(APIView):
-#     def post(self, request, format=None):
-#         serializer = CardCreateSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(data={"Отзыв создан": serializer.data}, status=status.HTTP_201_CREATED)
-#         return Response(data={"Что-то пошло не так!": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-class MangoCardCreateAPIView(CreateAPIView):
+class MangoCardAPIView(ListCreateAPIView):
     queryset = MangoCard.objects.all()
-    serializer_class = CardCreateSerializer
-    permission_classes = [IsAuthenticated, ]
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        card = MangoCard.objects.create(
-            title=serializer.validated_data['title'],
-            year=serializer.validated_data['year'],
-            description=serializer.validated_data['description'],
-            genre=serializer.validated_data['genre'],
-            type=serializer.validated_data['type'],
-        )
-        card.save()
-        return Response(data={serializer(card).data}, status=status.HTTP_201_CREATED)
-
-
-
+    serializer_class = CardSerializer
+    permission_classes = (IsAuthenticated, )
 
 
 class MangoCardListAPIView(generics.ListAPIView):
@@ -59,6 +39,8 @@ class MangoCardListAPIView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'year']
     pagination_class = CardPagination
+    permission_classes = (AllowAny, )
+
 
 class MangoCardDetailAPIView(APIView):
 
@@ -72,6 +54,7 @@ class MangoCardDetailAPIView(APIView):
             "card": serializer.data
         })
 
+
 # --- REVIEW ---
 
 class ReviewListAPIView(generics.ListAPIView):
@@ -84,21 +67,11 @@ class ReviewListAPIView(generics.ListAPIView):
 
 class ReviewCreateAPIView(CreateAPIView):
     serializer_class = ReviewCreateSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
-    def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        review = Review.objects.create(
-            text=serializer.validated_data["text"],
-            mango_id=serializer.validated_data["mango_id"],
-            user_id=request.user.id
-        )
-        review.save()
-        return Response(data=ReviewSerializer(review).data)
+        serializer.save(user=self.request.user)
 
-
-
-
-
-
+        return Response({"post": serializer.data})
