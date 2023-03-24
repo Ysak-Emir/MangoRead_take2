@@ -6,17 +6,6 @@ from mango.models import MangoCard, Review
 from users.models import User
 
 
-# class TypeSerializer()
-
-# class CardSerializer(serializers.Serializer):
-#     profile_picture = serializers.ImageField(default="null")
-#     title = serializers.CharField(max_length=100)
-#     year = serializers.IntegerField(max_value=3000)
-#     description = serializers.CharField(max_length=2000)
-#     genre_id = serializers.IntegerField()
-#     type_id = serializers.IntegerField()
-
-
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = MangoCard
